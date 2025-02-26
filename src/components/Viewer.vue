@@ -1,31 +1,10 @@
 <script setup lang="ts">
-import { readEmlData } from '@/utils/emlParser';
-import type { ReadedEmlJson } from 'eml-parse-js';
+import { readEmlData, parseEmlData } from '@/utils/emlParser';
 import { ref } from 'vue';
-
-// type
-type Mail = {
-    title: string,
-    from: string,
-    to: string[],
-    cc: string[],
-    attachments: string[],
-    body: string,
-    date: string,
-}
-
-const mailData: Mail = {
-    title: "",
-    from: "tanak@example.com",
-    to: ["matsumoto-kousuke@jmj.tmu.ac.jp", "matsumoto-kousuke@jmj.tmu.ac.jp", ],
-    cc: ["hoge@contoso.com", "fuga@example.com"],
-    attachments: [],
-    body: "",
-    date: "2025年/02月/25日 09:00",
-}
+import type { EmlData } from '..';
 
 // eml ref data
-const emlData = ref<ReadedEmlJson>();
+const emlData = ref<EmlData>();
 
 // File object
 const emlFile = ref<File>();
@@ -52,9 +31,10 @@ const onFileUpload = async () => {
     if(emlFile.value) {
         const emlTxt = await readFileAsText(emlFile.value);
         if(emlTxt) {
-            const eml = await readEmlData(emlTxt);
-            if(eml) {
-                emlData.value = eml;
+            const emlJson = await readEmlData(emlTxt);
+            if(emlJson) {
+                const parsedData = parseEmlData(emlJson);
+                emlData.value = parsedData;
             }
         }
     }    
@@ -95,9 +75,11 @@ const onFileUpload = async () => {
         <!--from row-->
         <v-row align="center">
             <v-col cols="auto">From:</v-col>
-            <v-col cols="auto">
-                <v-chip color="green">{{ emlData?.from }}</v-chip>
-            </v-col>
+            <template v-for="from in emlData?.from">
+                <v-col cols="auto">
+                    <v-chip color="green">{{ from.name }} &lt;{{ from.email }}&gt;</v-chip>
+                </v-col>
+            </template>            
         </v-row>
         
         <!--to row-->
@@ -105,7 +87,7 @@ const onFileUpload = async () => {
             <v-col cols="auto">To:</v-col>
             <template v-for="to in emlData?.to">
                 <v-col cols="auto">
-                    <v-chip color="primary">{{ to }}</v-chip>
+                    <v-chip color="primary">{{ to.name }} &lt;{{ to.email }}&gt;</v-chip>
                 </v-col>
             </template>            
         </v-row>
@@ -113,7 +95,7 @@ const onFileUpload = async () => {
         <!--cc row-->
         <v-row align="center">
             <v-col cols="auto">CC:</v-col>
-            <template v-for="cc in mailData.cc">
+            <template v-for="cc in emlData?.cc">
                 <v-col cols="auto">
                     <v-chip>{{ cc }}</v-chip>
                 </v-col>
@@ -122,11 +104,11 @@ const onFileUpload = async () => {
 
         <!--attachments row-->
         <v-row align="center">            
-            <template v-for="attachment in mailData.attachments">
+            <template v-for="attachment in emlData?.attachments">
                 <v-col cols="auto">
                     <v-btn
                     prepend-icon="mdi-file"                    
-                    :text="attachment"
+                    :text="attachment.name"
                     variant="outlined"
                     ></v-btn>                    
                 </v-col>
@@ -136,7 +118,9 @@ const onFileUpload = async () => {
         <!--body text row-->
         <v-row>
             <v-col>
-               <div>{{ emlData?.text }}</div>
+               <div 
+               :style="{ whiteSpace: 'pre-wrap'}"
+               >{{ emlData?.text }}</div>
             </v-col>
         </v-row>
     </v-sheet>
