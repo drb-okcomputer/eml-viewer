@@ -33,6 +33,7 @@ const onFileUpload = async () => {
         if(emlTxt) {
             const emlJson = await readEmlData(emlTxt);
             if(emlJson) {
+                console.log(emlJson);
                 const parsedData = parseEmlData(emlJson);
                 emlData.value = parsedData;
             }
@@ -43,9 +44,9 @@ const onFileUpload = async () => {
 
 </script>
 
-<template>
-    <v-sheet class="pa-10 mb-3">
-        <v-row>
+<template>    
+    <v-sheet class="pa-15">
+        <v-row class="mb-5">
             <v-col cols="6">
                 <v-file-input 
                 label="emlファイルをアップロードしてください"
@@ -54,8 +55,6 @@ const onFileUpload = async () => {
                 ></v-file-input>
             </v-col>
         </v-row>
-    </v-sheet>
-    <v-sheet class="pa-10">
         <!--date row-->
         <v-row>
             <v-col cols="auto">Date:</v-col>
