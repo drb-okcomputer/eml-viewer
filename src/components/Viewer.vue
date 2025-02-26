@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { readEmlData } from '@/utils/emlParser';
+import type { ReadedEmlJson } from 'eml-parse-js';
 import { ref } from 'vue';
 
 // type
 type Mail = {
     title: string,
+    from: string,
     to: string[],
     cc: string[],
     attachments: string[],
@@ -14,12 +16,16 @@ type Mail = {
 
 const mailData: Mail = {
     title: "",
+    from: "tanak@example.com",
     to: ["matsumoto-kousuke@jmj.tmu.ac.jp", "matsumoto-kousuke@jmj.tmu.ac.jp", ],
     cc: ["hoge@contoso.com", "fuga@example.com"],
     attachments: [],
     body: "",
     date: "2025年/02月/25日 09:00",
 }
+
+// eml ref data
+const emlData = ref<ReadedEmlJson>();
 
 // File object
 const emlFile = ref<File>();
@@ -44,9 +50,12 @@ const readFileAsText = (file: File) => {
 
 const onFileUpload = async () => {
     if(emlFile.value) {
-        const res = await readFileAsText(emlFile.value);
-        if(res) {
-            readEmlData(res);
+        const emlTxt = await readFileAsText(emlFile.value);
+        if(emlTxt) {
+            const eml = await readEmlData(emlTxt);
+            if(eml) {
+                emlData.value = eml;
+            }
         }
     }    
 }
@@ -55,7 +64,7 @@ const onFileUpload = async () => {
 </script>
 
 <template>
-    <v-sheet class="pa-6 mb-3">
+    <v-sheet class="pa-10 mb-3">
         <v-row>
             <v-col cols="6">
                 <v-file-input 
@@ -66,26 +75,35 @@ const onFileUpload = async () => {
             </v-col>
         </v-row>
     </v-sheet>
-    <v-sheet class="pa-6">
+    <v-sheet class="pa-10">
         <!--date row-->
         <v-row>
-            <v-col cols="3" class="d-flex ">
-                <p class="text-subtitle-2">{{ mailData.date }}</p>
+            <v-col cols="auto">Date:</v-col>
+            <v-col cols="auto">
+                <p>{{ emlData?.date.toLocaleString() }}</p>
+            </v-col>
+        </v-row>
+    
+        <!--title row-->
+        <v-row align="center">
+            <v-col cols="auto">Subject:</v-col>
+            <v-col>
+                <p>{{ emlData?.subject }}</p>             
             </v-col>
         </v-row>
 
-        <!--title row-->
+        <!--from row-->
         <v-row align="center">
-            <v-col cols="auto">Title:</v-col>
-            <v-col>
-                <p>{{ mailData.title }}</p>             
+            <v-col cols="auto">From:</v-col>
+            <v-col cols="auto">
+                <v-chip color="green">{{ emlData?.from }}</v-chip>
             </v-col>
         </v-row>
         
         <!--to row-->
         <v-row align="center">
             <v-col cols="auto">To:</v-col>
-            <template v-for="to in mailData.to">
+            <template v-for="to in emlData?.to">
                 <v-col cols="auto">
                     <v-chip color="primary">{{ to }}</v-chip>
                 </v-col>
@@ -115,10 +133,10 @@ const onFileUpload = async () => {
             </template>
         </v-row>
 
-        <!--attachments row-->
+        <!--body text row-->
         <v-row>
             <v-col>
-               
+               <div>{{ emlData?.text }}</div>
             </v-col>
         </v-row>
     </v-sheet>
