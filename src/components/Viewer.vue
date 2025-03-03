@@ -4,6 +4,34 @@ import { ref } from 'vue';
 import type { EmlData } from '..';
 import type { Attachment } from 'eml-parse-js';
 
+// attachment display color
+const attachmentColor = (fileName: string) => {
+    const lastDotIndex = fileName.lastIndexOf('.');
+    const ext = lastDotIndex !== -1 ? fileName.slice(lastDotIndex + 1).toLowerCase() : "";
+    switch(ext) {
+        case 'pdf':
+            return 'red';
+        case 'doc':
+        case 'docx':
+            return 'blue';
+        case 'xls':
+        case 'xlsx':
+            return 'green';
+        case 'ppt':
+        case 'pptx':
+            return 'orange';
+        case 'zip':
+            return 'purple';
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif':
+            return 'indigo';
+        default:
+            return undefined;
+    }
+};
+
 // eml ref data
 const emlData = ref<EmlData>();
 
@@ -95,7 +123,7 @@ const downloadAttachmentFile = (attachment: Attachment) => {
             <v-col cols="auto">From:</v-col>
             <template v-for="from in emlData?.from">
                 <v-col cols="auto">
-                    <v-chip color="green">{{ from.name }} &lt;{{ from.email }}&gt;</v-chip>
+                    <v-chip color="green">{{ from.name }}&lt;{{ from.email }}&gt;</v-chip>
                 </v-col>
             </template>            
         </v-row>
@@ -105,7 +133,7 @@ const downloadAttachmentFile = (attachment: Attachment) => {
             <v-col cols="auto">To:</v-col>
             <template v-for="to in emlData?.to">
                 <v-col cols="auto">
-                    <v-chip color="primary">{{ to.name }} &lt;{{ to.email }}&gt;</v-chip>
+                    <v-chip color="primary">{{ to.name }}&lt;{{ to.email }}&gt;</v-chip>
                 </v-col>
             </template>            
         </v-row>
@@ -115,7 +143,7 @@ const downloadAttachmentFile = (attachment: Attachment) => {
             <v-col cols="auto">CC:</v-col>
             <template v-for="cc in emlData?.cc">
                 <v-col cols="auto">
-                    <v-chip>{{ cc }}</v-chip>
+                    <v-chip>{{ cc.name }}&lt;{{ cc.email }}&gt;</v-chip>
                 </v-col>
             </template>
         </v-row>
@@ -125,6 +153,7 @@ const downloadAttachmentFile = (attachment: Attachment) => {
             <template v-for="attachment in emlData?.attachments">
                 <v-col cols="auto">
                     <v-btn
+                    :color="attachmentColor(attachment.name)"
                     prepend-icon="mdi-file"                    
                     :text="attachment.name"
                     variant="outlined"
