@@ -39,34 +39,41 @@ const emlData = ref<EmlData>();
 // File object
 const emlFile = ref<File>();
 
-const readFileAsText = (file: File) => {
-    const reader = new FileReader();
-    const promise = new Promise<string | undefined>((resolve, reject) => {
-        try {
-            reader.readAsText(file);
-            reader.onloadend = () => {
-                const res = reader.result as string;
-                resolve(res);
-            }
-
-        } catch(err) {
-            console.error(err);
-            reject(undefined);
+const readFileAsText = (file: File): Promise<string | { status: boolean, message: string }> => {
+    return new Promise((resolve, reject) => {
+        if(!/.eml$/i.test(file.name)) {
+            resolve({ status: false, message: "EMLファイルをアップロードしてください" });
+            return;
         }
-    });
-    return promise;
+
+        const reader = new FileReader();
+
+        reader.onload = () => {            
+            resolve(reader.result as string);
+        }
+        reader.onerror = () => {
+            reject({ status: false, message: "ファイルの読み取りエラーが発生しました" });
+        }
+        reader.readAsText(file);
+    });    
 }
 
 const onFileUpload = async () => {
-    if(emlFile.value) {
-        const emlTxt = await readFileAsText(emlFile.value);
-        if(emlTxt) {
-            const emlJson = await readEmlData(emlTxt);
-            if(emlJson) {
-                console.log(emlJson);
-                const parsedData = parseEmlData(emlJson);
-                emlData.value = parsedData;
+    if(emlFile.value) {        
+        try {
+            const emlTxt = await readFileAsText(emlFile.value);
+
+            if(typeof emlTxt !== 'string') {
+                alert(emlTxt.message);
+                return;
             }
+            const emlJson = await readEmlData(emlTxt);
+            const parsedData = parseEmlData(emlJson);
+            emlData.value = parsedData;
+        } catch(err) {
+            console.warn(err);
+            alert("EMLファイルの読み取りエラーが発生しました");
+            emlFile.value = undefined;
         }
     }    
 }
