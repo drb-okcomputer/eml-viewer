@@ -1,28 +1,33 @@
-import { readEml, type ReadedEmlJson } from "eml-parse-js";
+import { readEml, type EmailAddress, type ReadedEmlJson } from "eml-parse-js";
 import type { EmlData } from "..";
 
-export const readEmlData = (eml: string) => {
-    const promise = new Promise<ReadedEmlJson | undefined>((resolve, reject) => {
-        try {
-            readEml(eml, (err, ReadEmlJson) => {
-                if(ReadEmlJson) {                    
-                    resolve(ReadEmlJson);
-                }        
-            });            
-        } catch (error) {
-            console.error(error);
-            reject(undefined);
-        }
+export const readEmlData = (eml: string): Promise<ReadedEmlJson> => {
+    return new Promise((resolve, reject) => {
+        readEml(eml, (err, ReadEmlJson) => {
+            if(err) {
+                reject(err);
+                return;
+            }
+
+            if(ReadEmlJson && Object.hasOwn(ReadEmlJson, "subject")) {
+                resolve(ReadEmlJson);
+            } else {
+                reject(new Error("有効なEMLデータではありません"));
+            }
+        });        
     });
-    return promise;    
 }
 
 export const parseEmlData = (emlJson: ReadedEmlJson) => {    
+    const returnEmlAddrsArray = (data: EmailAddress | EmailAddress[] | null | undefined) => {
+        return !data ? [] : Array.isArray(data) ? data : [data];
+    }
+
     const emlData: EmlData = {
         subject: emlJson.subject,
-        from: !emlJson.from ? [] : Array.isArray(emlJson.from) ? emlJson.from : [emlJson.from],
-        to: !emlJson.to ? [] : Array.isArray(emlJson.to) ? emlJson.to : [emlJson.to],
-        cc: !emlJson.cc ? [] : Array.isArray(emlJson.cc) ? emlJson.cc : [emlJson.cc],
+        from: returnEmlAddrsArray(emlJson.from),
+        to: returnEmlAddrsArray(emlJson.to),
+        cc: returnEmlAddrsArray(emlJson.cc),
         date: emlJson.date instanceof Date ? emlJson.date.toLocaleString() : emlJson.date,
         attachments: emlJson.attachments,
         text: emlJson.text
