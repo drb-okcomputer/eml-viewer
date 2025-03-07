@@ -81,10 +81,11 @@ const onFileUpload = async () => {
 </script>
 
 <template>    
-    <v-sheet class="pa-15">
-        <v-row class="mb-5">
-            <v-col cols="6">
+    <v-sheet class="pa-5 pa-md-15">
+        <v-row class="mb-md-5">
+            <v-col md="12" lg="6">
                 <v-file-input 
+                accept="message/rfc822"
                 label="emlファイルをアップロードしてください"
                 v-model="emlFile"
                 @update:model-value="onFileUpload"
@@ -154,9 +155,9 @@ const onFileUpload = async () => {
 
         <!--body text row-->
         <v-row>
-            <v-col>
+            <v-col cols="auto">
                <div 
-               :style="{ whiteSpace: 'pre-wrap'}"
+               :style="{ whiteSpace: 'pre-wrap', width: '100%' }"
                >{{ emlData?.text }}</div>
             </v-col>
         </v-row>
