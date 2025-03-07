@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { readEmlData, parseEmlData } from '@/utils/emlParser';
+import { downloadAttachmentFile } from '@/utils/fileDownloader';
 import { ref } from 'vue';
 import type { EmlData } from '..';
 import type { Attachment } from 'eml-parse-js';
@@ -69,25 +70,6 @@ const onFileUpload = async () => {
         }
     }    
 }
-
-// on click download button
-const encodeBinaryString = (binaryString: string): Uint8Array<ArrayBuffer> => Uint8Array.from(
-	binaryString,
-	binaryChar => binaryChar.charCodeAt(0),
-);
-
-const downloadAttachmentFile = (attachment: Attachment) => {
-    const contentType = attachment.contentType.includes(";") ? attachment.contentType.split(";")[0] : attachment.contentType;
-    const data = encodeBinaryString(atob(attachment.data64));
-    const blob = new Blob([data], { type: contentType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = attachment.name;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
 
 </script>
 
