@@ -3,7 +3,6 @@ import { readEmlData, parseEmlData } from '@/utils/emlParser';
 import { downloadAttachmentFile } from '@/utils/fileDownloader';
 import { ref } from 'vue';
 import type { EmlData } from '..';
-import type { Attachment } from 'eml-parse-js';
 
 // attachment display color
 const attachmentColor = (fileName: string) => {
