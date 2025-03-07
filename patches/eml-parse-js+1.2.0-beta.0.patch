@@ -1,0 +1,81 @@
+diff --git a/node_modules/eml-parse-js/dist/index.es.js b/node_modules/eml-parse-js/dist/index.es.js
+index e36270c..0681667 100644
+--- a/node_modules/eml-parse-js/dist/index.es.js
++++ b/node_modules/eml-parse-js/dist/index.es.js
+@@ -2259,19 +2259,29 @@ function getEmailAddress(rawStr) {
+   return list;
+ }
+ function decodeJoint(str) {
++  // add regex for file name
++  const nameRegex = /\?(B|Q)\?.+?={0,2}\?/gi;
++  const matchName = str.match(nameRegex);
+   const match = /=\?([^?]+)\?(B|Q)\?(.+?)(\?=)/gi.exec(str);
+-  if (match) {
+-    const charset = getCharsetName(match[1] || defaultCharset);
++  if (match && matchName) {    
++    const charset = match[1] || defaultCharset;// remove "getCharsetName" function
+     const type = match[2].toUpperCase();
+-    const value = match[3];
++    const values = matchName.map((value) => {
++      var _a;
++      const groups = (_a = /\?(B|Q)\?(?<name>.+?={0,2})\?/gi.exec(value)) == null ? void 0 : _a.groups;
++      if (groups == null ? void 0 : groups.name) {
++        return groups.name;
++      }
++      return "";
++    });
+     if (type === "B") {
+       if (charset === "utf8") {
+-        return decode(encode(Base64.fromBase64(value.replace(/\r?\n/g, ""))), "utf8");
++        return values.map((value) => decode(encode(Base64.fromBase64(value.replace(/\r?\n/g, ""))), "utf8")).join("");        
+       } else {
+-        return decode(Base64.toUint8Array(value.replace(/\r?\n/g, "")), charset);
++        return values.map((value) => decode(Base64.toUint8Array(value.replace(/\r?\n/g, "")), charset)).join("");        
+       }
+     } else if (type === "Q") {
+-      return unquotePrintable(value, charset, true);
++      return values.map((value) => unquotePrintable(value, charset, true)).join("");
+     }
+   }
+   return str;
+@@ -2634,7 +2644,7 @@ function read(eml, options, callback) {
+   function _append(headers, content, result2) {
+     const contentType = headers["Content-Type"] || headers["Content-type"];
+     const contentDisposition = headers["Content-Disposition"];    
+-    const charset = getCharsetName(getCharset(contentType) || defaultCharset);
++    const charset = getCharset(contentType) || defaultCharset;// remove "getCharsetName function"
+     let encoding2 = headers["Content-Transfer-Encoding"] || headers["Content-transfer-encoding"];
+     if (typeof encoding2 === "string") {
+       encoding2 = encoding2.toLowerCase();
+@@ -2654,11 +2664,11 @@ function read(eml, options, callback) {
+       if (typeof content !== "string") {
+         content = decode(content, charset);
+       }
+-      let htmlContent = content.replace(/\r\n|(&quot;)/g, "").replace(/\"/g, `"`);
++      let htmlContent = content.replace(/\r\n|(&quot;)/g, "");
+       try {        
+         if (encoding2 === "base64") {
+           htmlContent = Base64.decode(htmlContent);          
+-        } else if (Base64.btoa(Base64.atob(htmlContent)) == htmlContent) {
++        } else if (Base64.isValid(htmlContent)) { // remove Base64.btoa(Base64.atob(htmlContent)) == htmlContent          
+           htmlContent = Base64.atob(htmlContent);          
+         }
+       } catch (error2) {
+@@ -2703,7 +2713,7 @@ function read(eml, options, callback) {
+       for (const key of NameContainer) {
+         const name = headers[key];
+         if (name) {
+-          result_name = name.replace(/(\s|'|utf-8|\*[0-9]\*)/g, "").split(";").map((v) => /name[\*]?="?(.+?)"?$/gi.exec(v)).reduce((a, b) => {
++          result_name = name.replace(/(\s|'|\*[0-9]\*)/g, "").split(";").map((v) => /name[\*]?="?(.+?)"?$/gi.exec(v)).reduce((a, b) => {
+             if (b && b[1]) {
+               a += b[1];
+             }
+@@ -2715,7 +2725,7 @@ function read(eml, options, callback) {
+         }
+       }
+       if (result_name) {
+-        attachment.name = decodeURI(result_name);
++        attachment.name = decodeJoint(result_name);// modify decodeURI to decodeJoint
+       }
+       const ct = headers["Content-Type"] || headers["Content-type"];
+       if (ct) {
