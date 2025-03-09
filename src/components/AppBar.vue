@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useTheme, useDisplay } from 'vuetify';
 
 // drawer
@@ -8,15 +8,27 @@ const drawer = ref<boolean>(false);
 // display
 const { mobile } = useDisplay();
 
+// system theme
+const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+
 // theme
 const theme = useTheme();
+theme.global.name.value = systemTheme;
 
-const selectedTheme = ref<string>("Light");
+const selectedTheme = ref<string>("system");
 const themeList = [
-    { name: "Light", icon: "mdi-white-balance-sunny" },
-    { name: "Dark", icon: "mdi-weather-night" },
-    { name: "System", icon: "mdi-desktop-tower-monitor" }
+    { value: "light", label: "Light", icon: "mdi-white-balance-sunny" },
+    { value: "dark", label: "Dark", icon: "mdi-weather-night" },
+    { value: "system", label: "System", icon: "mdi-desktop-tower-monitor" }
 ];
+
+watch(selectedTheme, (value) => {
+    if (value === "system") {
+        theme.global.name.value = systemTheme;
+    } else {
+        theme.global.name.value = value;
+    }
+});
 </script>
 
 <template>
@@ -44,13 +56,13 @@ const themeList = [
         <v-radio
         v-for="(item, index) in themeList"
         :key="index"
-        :value="item.name"
+        :value="item.value"
         class="mb-2"
         >
         <template v-slot:label>
             <div class="d-flex align-center ga-2 ml-2">
                 <v-icon :icon="item.icon"></v-icon>
-                <span>{{ item.name }}</span>
+                <span>{{ item.label }}</span>
             </div>
         </template>
         </v-radio>    
