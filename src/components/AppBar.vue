@@ -46,6 +46,7 @@ watch(selectedTheme, (value) => {
     v-model="drawer"
     :location="mobile ? 'bottom' : 'right'"
     class="px-3 py-5 bg-indigo-darken-1"
+    temporary
     >
         <v-radio-group
         v-model="selectedTheme"
