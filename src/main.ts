@@ -1,4 +1,3 @@
-import './assets/main.css'
 import "@/assets/custom.scss"
 
 // vuetify
