@@ -141,13 +141,23 @@ const onFileUpload = async () => {
         <v-row align="center">            
             <template v-for="attachment in emlData?.attachments">
                 <v-col cols="auto">
-                    <v-btn
-                    :color="attachmentColor(attachment.name)"
-                    prepend-icon="mdi-file"                    
-                    :text="attachment.name"
-                    variant="outlined"
-                    @click="downloadAttachmentFile(attachment)"
-                    ></v-btn>                    
+                    <v-tooltip
+                    text="添付ファイルをダウンロード"       
+                    location="bottom"   
+                    open-delay="300"          
+                    >
+                    <template v-slot:activator="{ props }">
+                        <v-btn
+                        v-bind="props"
+                        aria-label="添付ファイルをダウンロード"
+                        :color="attachmentColor(attachment.name)"
+                        prepend-icon="mdi-file"                    
+                        :text="attachment.name"
+                        variant="outlined"
+                        @click="downloadAttachmentFile(attachment)"
+                        ></v-btn>
+                    </template>
+                    </v-tooltip>                                        
                 </v-col>
             </template>
         </v-row>
