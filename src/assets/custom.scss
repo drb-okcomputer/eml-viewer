@@ -12,7 +12,7 @@ $htmlTags: div, span, h1, h2, h3, h4, h5, h6, p, pre, a, abbr, address, code, sm
   center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead,
   tr, th, td, article;
 
-#app {
+#app, .v-overlay {
   font-family: $body-font-family;
 
   // Vuetifyのtypography option使用箇所にすべて指定のfont-familyを上書きする
