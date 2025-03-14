@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppBar from './components/AppBar.vue';
 import Viewer from './components/Viewer.vue';
+import Footer from './components/Footer.vue';
 </script>
 
 <template>
@@ -9,5 +10,6 @@ import Viewer from './components/Viewer.vue';
     <v-main>
       <viewer />
     </v-main>
+    <Footer></Footer>
   </v-app>
 </template>
