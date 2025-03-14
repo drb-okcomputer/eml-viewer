@@ -80,7 +80,7 @@ const onFileUpload = async () => {
 </script>
 
 <template>    
-    <v-sheet class="pa-5 pa-md-15" :style="{minHeight: 'calc(100dvh - 64px)'}">
+    <v-sheet class="pa-5 pa-md-15" :style="{minHeight: 'calc(100dvh - 128px)'}">
         <v-row class="mb-md-5">
             <v-col md="12" lg="6">
                 <v-file-input 
