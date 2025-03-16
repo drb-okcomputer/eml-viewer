@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { VitePWA } from 'vite-plugin-pwa'
+import Sitemap from "vite-plugin-sitemap"
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
     vue(),
     vuetify(),
     vueDevTools(),
+    Sitemap({ hostname: "https://emlviewer.okcomputer.app/"}),
     VitePWA({ 
       registerType: 'autoUpdate',
       devOptions: {
