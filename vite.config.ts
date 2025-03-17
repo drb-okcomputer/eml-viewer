@@ -50,6 +50,30 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: "assets/[name].[ext]",
+        chunkFileNames: "assets/[name].js",
+        entryFileNames: "assets/[name].js",
+        manualChunks: (id) => {
+          if(id.includes("node_modules")) {
+            if(id.includes("eml-parse-js")) {
+              console.log(id);
+              return "vender_eml"
+            } else if(id.includes("vuetify")) {
+              return "vender_vuetify"
+            } else if(id.includes("vue")) {
+              return "vender_vue"
+            } else {
+              console.log(id);
+              return "vendor_other"
+            }
+          }
+        },
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
