@@ -1,3 +1,5 @@
+// Supports weights 100-900
+import '@fontsource-variable/noto-sans-jp/wght.css';
 import "@/assets/custom.scss"
 
 // vuetify
