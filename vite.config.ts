@@ -23,7 +23,7 @@ export default defineConfig({
         name: "EML VIEWER",
         short_name: "EML VIEWER",
         theme_color: "#ffffff",
-        description: "EMLファイルのビューアーです。",
+        description: "ブラウザ上で動作するEMLファイルビューア。PWA対応でオフラインでも利用可能。メールの内容を閲覧し、添付ファイルのダウンロードもできます。",
         "icons": [
           {
             "src": "pwa-64x64.png",
