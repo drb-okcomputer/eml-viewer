@@ -1,8 +1,36 @@
 diff --git a/node_modules/eml-parse-js/dist/index.es.js b/node_modules/eml-parse-js/dist/index.es.js
-index e36270c..0681667 100644
+index e36270c..5c4d2c2 100644
 --- a/node_modules/eml-parse-js/dist/index.es.js
 +++ b/node_modules/eml-parse-js/dist/index.es.js
-@@ -2259,19 +2259,29 @@ function getEmailAddress(rawStr) {
+@@ -1823,9 +1823,11 @@ function getBoundary(contentType) {
+   const match = /(?:B|b)oundary=(?:'|")?(.+?)(?:'|")?(\s*;[\s\S]*)?$/g.exec(contentType);
+   return match ? match[1] : void 0;
+ }
++/* disused
+ function getCharsetName(charset) {
+   return charset.toLowerCase().replace(/[^0-9a-z]/g, "");
+ }
++*/
+ function guid() {
+   return "xxxxxxxxxxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c2) {
+     const r = Math.random() * 16 | 0, v = c2 == "x" ? r : r & 3 | 8;
+@@ -1854,6 +1856,7 @@ function mimeDecode(str = "", fromCharset = "UTF-8") {
+   }
+   return decode(buffer, fromCharset);
+ }
++/* disused
+ const GB2312UTF8 = {
+   Dig2Dec: function(s) {
+     let retV = 0;
+@@ -1975,6 +1978,7 @@ const GB2312UTF8 = {
+     return substr + str1;
+   }
+ };
++*/
+ function _handleAddress(tokens) {
+   let token;
+   let isGroup = false;
+@@ -2259,19 +2263,29 @@ function getEmailAddress(rawStr) {
    return list;
  }
  function decodeJoint(str) {
@@ -38,7 +66,7 @@ index e36270c..0681667 100644
      }
    }
    return str;
-@@ -2634,7 +2644,7 @@ function read(eml, options, callback) {
+@@ -2634,14 +2648,14 @@ function read(eml, options, callback) {
    function _append(headers, content, result2) {
      const contentType = headers["Content-Type"] || headers["Content-type"];
      const contentDisposition = headers["Content-Disposition"];    
@@ -47,7 +75,15 @@ index e36270c..0681667 100644
      let encoding2 = headers["Content-Transfer-Encoding"] || headers["Content-transfer-encoding"];
      if (typeof encoding2 === "string") {
        encoding2 = encoding2.toLowerCase();
-@@ -2654,11 +2664,11 @@ function read(eml, options, callback) {
+     }
+     if (encoding2 === "base64") {
+       if (contentType && contentType.indexOf("gbk") >= 0) {
+-        content = encode(GB2312UTF8.GB2312ToUTF8(content.replace(/\r?\n/g, "")));
++        content = encode(content.replace(/\r?\n/g, ""), "gbk"); // remove "GB2312ToUTF8" object
+       } else {
+         content = encode(content.replace(/\r?\n/g, ""));
+       }
+@@ -2654,11 +2668,11 @@ function read(eml, options, callback) {
        if (typeof content !== "string") {
          content = decode(content, charset);
        }
@@ -61,7 +97,7 @@ index e36270c..0681667 100644
            htmlContent = Base64.atob(htmlContent);          
          }
        } catch (error2) {
-@@ -2703,7 +2713,7 @@ function read(eml, options, callback) {
+@@ -2703,7 +2717,7 @@ function read(eml, options, callback) {
        for (const key of NameContainer) {
          const name = headers[key];
          if (name) {
@@ -70,7 +106,7 @@ index e36270c..0681667 100644
              if (b && b[1]) {
                a += b[1];
              }
-@@ -2715,7 +2725,7 @@ function read(eml, options, callback) {
+@@ -2715,7 +2729,7 @@ function read(eml, options, callback) {
          }
        }
        if (result_name) {
@@ -79,3 +115,12 @@ index e36270c..0681667 100644
        }
        const ct = headers["Content-Type"] || headers["Content-type"];
        if (ct) {
+@@ -2844,7 +2858,7 @@ function read(eml, options, callback) {
+ }
+ export {
+   Base642 as Base64,
+-  GB2312UTF8 as GBKUTF8,
++  //GB2312UTF8 as GBKUTF8,
+   build as buildEml,
+   completeBoundary,
+   convert,
